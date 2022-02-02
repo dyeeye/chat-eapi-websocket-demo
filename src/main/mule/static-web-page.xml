@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:websocket="http://www.mulesoft.org/schema/mule/websocket"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/websocket http://www.mulesoft.org/schema/mule/websocket/current/mule-websocket.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="new-chat-messages-flow" doc:id="9b90b391-d242-4543-8f52-21499f0ee7e8" >
+		<websocket:inbound-listener doc:name="On New Inbound Message" doc:id="c4008460-1c5a-4c7d-b66f-4681c4eaa88d" config-ref="WebSockets_Config" path="/messages" outputMimeType="application/json"/>
+		<ee:transform doc:name="Chat Message" doc:id="ad386921-28ac-4ce7-a421-7c56ea97b78a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "<b>$(payload.name)</b>: $(payload.message) <br />"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<websocket:broadcast doc:name="Broadcast" doc:id="30581e42-327f-461d-b891-de1f8e51b6a8" config-ref="WebSockets_Config" path="/ws/messages"/>
+	</flow>
+	<flow name="static-web-pageFlow" doc:id="8d0d44ca-7723-41be-b649-167966523348" >
+		
+		<http:listener doc:name="Listener" doc:id="fd32c233-cd03-4a8e-9e4a-bb8d1e5c7a9e" path="/meetup" config-ref="HTTP_Listener_config"/>
+		<parse-template doc:name="Web Page" doc:id="25a0b181-ff9f-4cd2-b1ce-3a149419a903" location="page/index.html" outputMimeType="text/html"/>
+	</flow>
+</mule>

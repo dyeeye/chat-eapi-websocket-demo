@@ -1,0 +1,51 @@
+<html>
+	<head>
+		<title>Calicut MuleSoft Meetup</title>
+		<script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+		<script type="text/javascript">
+			
+			//connect to WebSocket
+			var ws = new WebSocket("ws://localhost:8091/ws/messages");
+			
+			//wait for messages back
+			ws.onmessage = function (event) {
+				$('#msgs').append(JSON.parse(event.data).message);
+			}
+			
+			// send message
+			function sendMessage() {
+				var name = document.getElementById("name").value;
+				var msg = document.getElementById("msg").value;
+				var request = {
+					name: name,
+					message: msg
+				};
+				ws.send(JSON.stringify(request));
+			}
+			
+			// send message on form submit
+			$(document).ready(function() {
+			    $(document).on('submit', '#my-form', function() {
+			      sendMessage();
+			      return false;
+			     });
+			});
+			
+		</script>
+	</head>
+	<body>
+		<h1>Calicut  MuleSoft Meetup</h1>
+		<h2>Say Hello!</h2>
+		<form id="my-form">
+		  <label for="name">Name:</label><br>
+		  <input type="text" id="name" name="name"><br>
+		  <label for="msg">Message:</label><br>
+		  <input type="text" id="msg" name="msg"><br><br>
+		  <input type="submit" value="Submit">
+		</form> 
+		<hr />
+		<div>
+			<p id="msgs"></p>
+		</div>
+	</body>
+</html>
